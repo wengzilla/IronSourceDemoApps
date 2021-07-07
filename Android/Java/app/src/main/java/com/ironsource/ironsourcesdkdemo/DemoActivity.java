@@ -1,13 +1,9 @@
 package com.ironsource.ironsourcesdkdemo;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -15,6 +11,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+
+import com.edweng.adsquitsdk.AdQuitManager;
 import com.ironsource.adapters.supersonicads.SupersonicConfig;
 import com.ironsource.mediationsdk.ISBannerSize;
 import com.ironsource.mediationsdk.IronSource;
@@ -29,6 +28,7 @@ import com.ironsource.mediationsdk.sdk.InterstitialListener;
 import com.ironsource.mediationsdk.sdk.OfferwallListener;
 import com.ironsource.mediationsdk.sdk.RewardedVideoListener;
 import com.ironsource.mediationsdk.utils.IronSourceUtils;
+
 
 public class DemoActivity extends Activity implements RewardedVideoListener, OfferwallListener, InterstitialListener, ImpressionDataListener {
 
@@ -57,7 +57,7 @@ public class DemoActivity extends Activity implements RewardedVideoListener, Off
         IronSource.getAdvertiserId(this);
         //Network Connectivity Status
         IronSource.shouldTrackNetworkState(this, true);
-
+        new AdQuitManager();
     }
     private void startIronSourceInitTask(){
         String advertisingId = IronSource.getAdvertiserId(DemoActivity.this);
