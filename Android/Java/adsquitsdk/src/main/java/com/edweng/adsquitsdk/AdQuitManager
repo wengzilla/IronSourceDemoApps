@@ -1,8 +1,0 @@
-package com.edweng.adsquitsdk;
-import android.util.Log;
-
-public class AdQuitManager {
-    public AdQuitManager() {
-        Log.d("AdQuitManager", "HELLO, WORLD");
-    }
-}

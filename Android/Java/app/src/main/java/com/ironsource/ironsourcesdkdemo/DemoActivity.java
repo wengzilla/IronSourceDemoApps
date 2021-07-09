@@ -57,7 +57,7 @@ public class DemoActivity extends Activity implements RewardedVideoListener, Off
         IronSource.getAdvertiserId(this);
         //Network Connectivity Status
         IronSource.shouldTrackNetworkState(this, true);
-        new AdQuitManager();
+
     }
     private void startIronSourceInitTask(){
         String advertisingId = IronSource.getAdvertiserId(DemoActivity.this);
@@ -75,14 +75,14 @@ public class DemoActivity extends Activity implements RewardedVideoListener, Off
         // set client side callbacks for the offerwall
         SupersonicConfig.getConfigObj().setClientSideCallbacks(true);
         // set the interstitial listener
-        IronSource.setInterstitialListener(this);
+        AdQuitManager.setInterstitialListener(this);
         // add the Impression Data listener
         IronSource.addImpressionDataListener(this);
 
         // set the IronSource user id
         IronSource.setUserId(userId);
         // init the IronSource SDK
-        IronSource.init(this, appKey);
+        AdQuitManager.init(this, appKey);
 
         updateButtonsState();
 
