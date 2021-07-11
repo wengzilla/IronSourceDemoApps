@@ -47,6 +47,9 @@ public class AdQuitUtil {
     }
 
     public static void pingAdInfo(Context context, ImpressionData impressionData) throws IOException {
+
+        // TODO: Refactor AsyncTask out of this static method to make it reusable...
+
         AsyncTask<String, Void, String> asyncTask = new AsyncTask<String, Void, String>() {
             JSONObject dictionary;
 

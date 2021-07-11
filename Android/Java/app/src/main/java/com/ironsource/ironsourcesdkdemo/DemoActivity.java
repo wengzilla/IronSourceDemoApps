@@ -57,7 +57,6 @@ public class DemoActivity extends Activity implements RewardedVideoListener, Off
         IronSource.getAdvertiserId(this);
         //Network Connectivity Status
         IronSource.shouldTrackNetworkState(this, true);
-
     }
     private void startIronSourceInitTask(){
         String advertisingId = IronSource.getAdvertiserId(DemoActivity.this);
