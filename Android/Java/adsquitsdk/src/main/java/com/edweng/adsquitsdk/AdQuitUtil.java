@@ -82,4 +82,16 @@ public class AdQuitUtil {
 
         asyncTask.execute();
     }
+
+    public static void pingAppOpen(Context context, ImpressionData impressionData) {
+
+    }
+
+    public static void pingAppBackground(Context context, ImpressionData impressionData) {
+
+    }
+
+    public static void pingAppQuit(Context context, ImpressionData impressionData) {
+
+    }
 }

@@ -2,6 +2,8 @@ package com.edweng.adsquitsdk;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -17,6 +19,9 @@ import com.ironsource.mediationsdk.sdk.InitializationListener;
 import com.ironsource.mediationsdk.sdk.InterstitialListener;
 
 import java.io.IOException;
+import java.util.UUID;
+
+import static android.provider.Settings.System.getString;
 
 public class AdQuitManager implements InterstitialListener, ImpressionDataListener, Application.ActivityLifecycleCallbacks {
     private static AdQuitManager sharedAdQuitManager = null;
@@ -24,6 +29,7 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
     InterstitialListener interstitialListener;
     Activity activity;
     String appKey;
+    String userId;
 
     private AdQuitManager() {
     }
@@ -32,8 +38,26 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
         IronSource.init(activity, appKey, (IronSource.AD_UNIT[])null);
         AdQuitManager.getInstance().activity = activity;
         AdQuitManager.getInstance().appKey = appKey;
+        AdQuitManager.getInstance().userId = fetchUserId(activity);
 
         activity.getApplication().registerActivityLifecycleCallbacks(AdQuitManager.getInstance());
+
+        Log.d(TAG, "User ID is " + AdQuitManager.getInstance().userId);
+    }
+
+    public static String fetchUserId(Activity activity) {
+        SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        String prefKey = activity.getResources().getString(R.string.user_id);
+        String userId = sharedPref.getString(prefKey, null);
+
+        if(userId == null) {
+            userId = UUID.randomUUID().toString();
+            editor.putString(prefKey, userId);
+            editor.apply();
+        }
+
+        return userId;
     }
 
     public static void init(Activity activity, String appKey, IronSource.AD_UNIT... adUnits) {
@@ -48,7 +72,6 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
 
             IronSource.setInterstitialListener(sharedAdQuitManager);
             IronSource.addImpressionDataListener(sharedAdQuitManager);
-
         }
 
         return sharedAdQuitManager;
@@ -106,36 +129,36 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-
+        Log.e(TAG, "ACTIVITY CREATED" + activity.toString());
     }
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-
+        Log.e(TAG, "ACTIVITY STARTED " + activity.toString());
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY RESUMED");
+        Log.e(TAG, "ACTIVITY RESUMED " + activity.toString());
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY PAUSED");
+        Log.e(TAG, "ACTIVITY PAUSED " + activity.toString());
     }
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-
+        Log.e(TAG, "ACTIVITY STOPPED " + activity.toString());
     }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-
+        Log.e(TAG, "ACTIVITY SAVE INSTANCE STATE " + activity.toString());
     }
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-
+        Log.e(TAG, "ACTIVITY DESTROYED " + activity.toString());
     }
 }
