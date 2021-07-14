@@ -123,7 +123,7 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
         /* TO-DO: Send ping to backend with impression data. */
         Log.d(TAG, "onImpressionSuccess");
         try {
-            AdQuitUtil.pingAdInfo(activity.getApplicationContext(), impressionData);
+            AdQuitUtil.pingAdInfo(activity, impressionData);
         } catch(IOException e) {
             Log.e(TAG, e.toString());
         }
