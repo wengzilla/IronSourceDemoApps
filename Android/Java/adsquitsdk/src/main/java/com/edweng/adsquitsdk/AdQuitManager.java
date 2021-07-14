@@ -26,6 +26,8 @@ import static android.provider.Settings.System.getString;
 public class AdQuitManager implements InterstitialListener, ImpressionDataListener, Application.ActivityLifecycleCallbacks {
     private static AdQuitManager sharedAdQuitManager = null;
     private static final String TAG="AdQuitManager";
+    private int activityReferences = 0;
+    private boolean isActivityChangingConfigurations = false;
     InterstitialListener interstitialListener;
     Activity activity;
     String appKey;
@@ -129,36 +131,36 @@ public class AdQuitManager implements InterstitialListener, ImpressionDataListen
 
     @Override
     public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-        Log.e(TAG, "ACTIVITY CREATED" + activity.toString());
     }
 
     @Override
     public void onActivityStarted(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY STARTED " + activity.toString());
+        if (++activityReferences == 1 && !isActivityChangingConfigurations) {
+            Log.e(TAG, "APP IN FOREGROUND " + activity.toString());
+        }
     }
 
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY RESUMED " + activity.toString());
     }
 
     @Override
     public void onActivityPaused(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY PAUSED " + activity.toString());
     }
 
     @Override
     public void onActivityStopped(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY STOPPED " + activity.toString());
+        isActivityChangingConfigurations = activity.isChangingConfigurations();
+        if (--activityReferences == 0 && !isActivityChangingConfigurations) {
+            Log.e(TAG, "APP IN BACKGROUND " + activity.toString());
+        }
     }
 
     @Override
     public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
-        Log.e(TAG, "ACTIVITY SAVE INSTANCE STATE " + activity.toString());
     }
 
     @Override
     public void onActivityDestroyed(@NonNull Activity activity) {
-        Log.e(TAG, "ACTIVITY DESTROYED " + activity.toString());
     }
 }
