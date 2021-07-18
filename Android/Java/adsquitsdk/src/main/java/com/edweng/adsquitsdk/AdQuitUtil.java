@@ -7,6 +7,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.ironsource.mediationsdk.IronSource;
@@ -17,6 +19,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -32,7 +36,7 @@ public class AdQuitUtil {
             = MediaType.get("application/json; charset=utf-8");
     private static final String TAG="AdQuitUtil";
 
-    public static JSONObject getEventParams(Activity activity) throws PackageManager.NameNotFoundException, JSONException {
+    public static JSONObject getEventParams(Activity activity, String event_name) throws PackageManager.NameNotFoundException, JSONException {
         JSONObject dictionary = new JSONObject();
         PackageInfo pInfo = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0);
 
@@ -43,7 +47,7 @@ public class AdQuitUtil {
         dictionary.put("device_id", IronSource.getAdvertiserId(activity.getApplicationContext()));
         dictionary.put("uuid", null);
         dictionary.put("user_id", fetchUserId(activity));
-        dictionary.put("event_name", "ad_impression_data");
+        dictionary.put("event_name", event_name);
 
         return dictionary;
     }
@@ -55,22 +59,26 @@ public class AdQuitUtil {
         return userId;
     }
 
-    public static void pingAdInfo(Activity activity, ImpressionData impressionData) throws IOException {
+    public static void pingAdInfo(Activity activity, ImpressionData impressionData) {
+        ping(activity, "ad_impression_data", impressionData.getAllData());
+    }
 
-        // TODO: Refactor AsyncTask out of this static method to make it reusable...
+    public static void ping(Activity activity, String event_name, JSONObject data) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Handler handler = new Handler(Looper.getMainLooper());
 
-        AsyncTask<String, Void, String> asyncTask = new AsyncTask<String, Void, String>() {
-            JSONObject dictionary;
-
+        executor.execute(new Runnable() {
             @Override
-            protected String doInBackground(String... params) {
+            public void run() {
+                JSONObject dictionary = null;
                 try {
-                    dictionary = getEventParams(activity);
-                    dictionary.put("data", impressionData.getAllData());
+                    dictionary = getEventParams(activity, event_name);
+                    if (data != null) {
+                        dictionary.put("data", data);
+                    }
                 } catch (JSONException | PackageManager.NameNotFoundException e) {
                     Log.e(TAG, e.toString());
                 }
-
                 OkHttpClient client = new OkHttpClient();
                 RequestBody body = RequestBody.create(JSON, dictionary.toString());
                 Request request = new Request.Builder()
@@ -84,23 +92,20 @@ public class AdQuitUtil {
                 } catch(IOException e) {
                     Log.e(TAG, e.toString());
                 }
-
-                return null;
             }
-        };
-
-        asyncTask.execute();
-    }
-
-    public static void pingAppOpen(Context context, ImpressionData impressionData) {
+        });
 
     }
 
-    public static void pingAppBackground(Context context, ImpressionData impressionData) {
-
+    public static void pingAppOpen(Activity activity) {
+        ping(activity, "app_open", null);
     }
 
-    public static void pingAppQuit(Context context, ImpressionData impressionData) {
+    public static void pingAppBackground(Activity activity) {
+        ping(activity, "app_background", null);
+    }
 
+    public static void pingAppQuit(Activity activity) {
+        ping(activity, "app_quit", null);
     }
 }
